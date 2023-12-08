@@ -13,9 +13,7 @@ jobs:
 
       - name: test read form repo
         run: |
-          echo ${{ secrets.SSH_PRIVATE_KEY }}
-          echo ${{ secrets.SERVER_HOST }}
-          echo ${{ secrets.SERVER_USERNAME }}
+
           echo ${{ env.DOMAIN_PATH}}
 
     #   - name: Setup Node.js
