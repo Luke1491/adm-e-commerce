@@ -18,7 +18,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            scp -r ./* ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:${{ vars.DOMAIN_PATH}}/
+            scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r ./* ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:${{ vars.DOMAIN_PATH}}/
 
       - name: Install dependencies and build
         uses: appleboy/ssh-action@master
