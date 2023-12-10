@@ -18,7 +18,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ${{ vars.DOMAIN_PATH }} && git pull && npm ci && npm run build && devil www restart e-commerce.sandbox.usermd.net
+            cd ${{ vars.DOMAIN_PATH }}/adm-e-commerce && git pull && npm ci && npm run build && devil www restart e-commerce.sandbox.usermd.net
 
     #   - name: Install dependencies and build
     #     uses: appleboy/ssh-action@master
