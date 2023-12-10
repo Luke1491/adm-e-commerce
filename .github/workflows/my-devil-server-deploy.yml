@@ -11,14 +11,34 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Deploy to Server via SSH
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18.x
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Send .next folder to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: .next
+          target: ${{ vars.DOMAIN_PATH }}/adm-e-commerce
+
+      - name: Restart site on server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ${{ vars.DOMAIN_PATH }}/adm-e-commerce && git pull && npm ci && npm run build && devil www restart e-commerce.sandbox.usermd.net
+            cd ${{ vars.DOMAIN_PATH }}/adm-e-commerce && git pull && npm ci && devil www restart e-commerce.sandbox.usermd.net
 
     #   - name: Install dependencies and build
     #     uses: appleboy/ssh-action@master
