@@ -14,7 +14,7 @@ export default function Hero() {
             <br />
             with a <span className="text-primary">pizza</span>
           </h1>
-          <p className="my-4 text-gray-500 text-sm">
+          <p className="my-6 text-gray-500 text-sm">
             {" "}
             Pizza is the missing piece that makes every day complete, a simple
             yet delicious joy in life
