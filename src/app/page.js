@@ -18,11 +18,11 @@ export default function Home() {
           </p>
           <p>
             Try our signature Margherita pizza, topped with ripe tomatoes, fresh
-            basil, and creamy mozzarella. Or if you're feeling adventurous, go
+            basil, and creamy mozzarella. Or if you are feeling adventurous, go
             for our spicy Pepperoni pizza.
           </p>
           <p>
-            Don't forget to check out our sides too! Our garlic bread and
+            Do not forget to check out our sides too! Our garlic bread and
             chicken wings are the perfect complement to any pizza.
           </p>
         </div>
