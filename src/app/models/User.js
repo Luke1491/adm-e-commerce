@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
 const UserSchema = new mongoose.Schema(
   {
@@ -17,5 +18,12 @@ const UserSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+//hash password before saving (after validation)
+UserSchema.post("validate", function (user) {
+  const notHashedPassword = user.password;
+  const salt = bcrypt.genSaltSync(10);
+  user.password = bcrypt.hashSync(notHashedPassword, salt);
+});
 
 export const User = mongoose.models.User || mongoose.model("User", UserSchema);

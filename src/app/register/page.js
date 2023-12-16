@@ -6,10 +6,13 @@ import { useState } from "react";
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [creatingUser, setCreatingUser] = useState(false);
+  const [createdUser, setCreatedUser] = useState(false);
 
-  function handleFormSubmit(event) {
+  async function handleFormSubmit(event) {
     event.preventDefault();
-    fetch("/api/register", {
+    setCreatingUser(true);
+    await fetch("/api/register", {
       method: "POST",
       body: JSON.stringify({
         email,
@@ -23,6 +26,7 @@ export default function RegisterPage() {
       .then((data) => {
         console.log(data);
       });
+    setCreatingUser(false);
   }
 
   return (
@@ -34,6 +38,7 @@ export default function RegisterPage() {
           type="email"
           placeholder="Email"
           value={email}
+          disabled={creatingUser}
           onChange={(event) => setEmail(event.target.value)}
         />
         <input
@@ -41,9 +46,10 @@ export default function RegisterPage() {
           type="password"
           placeholder="Password"
           value={password}
+          disabled={creatingUser}
           onChange={(event) => setPassword(event.target.value)}
         />
-        <button className="" type="submit">
+        <button className="" type="submit" disabled={creatingUser}>
           Register
         </button>
         <div className="my-4 text-center text-gray-400">
