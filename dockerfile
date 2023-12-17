@@ -3,6 +3,9 @@ FROM node:20.10-alpine AS build
 
 WORKDIR /app
 
+# set environment variables for the build
+ENV MONGODB_URL="mongodb://127.0.0.1:27017"
+
 # Copy package.json and package-lock.json to install dependencies
 COPY package.json package-lock.json ./
 RUN npm install
