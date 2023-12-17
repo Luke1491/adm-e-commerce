@@ -6,6 +6,8 @@ export async function POST(req) {
     const body = await req.json();
 
     //TO DO - validate email and password
+    if (!body?.email || !body?.password)
+      return new Response("email or password missing", { status: 403 });
 
     // console.log(body);
     // console.log(process.env.MONGODB_URL);
