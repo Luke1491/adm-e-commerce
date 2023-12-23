@@ -41,6 +41,7 @@ jobs:
           key: ${{ secrets.MIKRUS_T395_PRIVATE_KEY }}
           port: 10395
           script: |
+            CONTAINER_ID=$(docker ps -aq --filter "ancestor=${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}")
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}
-            docker rm -f $(docker ps -aq --filter "ancestor=${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}")
+            docker rm -f $CONTAINER_ID
             docker run -p 20395:3000 -e MONGODB_URL=${{ secrets.MIKRUS_T395_MONGO_DB_URL }} -e NEXTAUTH_URL=${{ secrets.MIKRUS_T395_NEXTAUTH_URL }} -e NEXTAUTH_SECRET=${{ secrets.MIKRUS_T395_NEXTAUTH_SECRET }} -e GOOGLE_CLIENT_ID=${{ secrets.MIKRUS_T395_GOOGLE_CLIENT_ID }} -e GOOGLE_CLIENT_SECRET=${{ secrets.MIKRUS_T395_GOOGLE_CLIENT_SECRET }} -d ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}
