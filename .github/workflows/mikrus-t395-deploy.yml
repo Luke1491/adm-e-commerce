@@ -1,0 +1,55 @@
+name: Deploy E-commerce Pizza
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Build Docker image
+        run: |
+          docker build -t e-commerce-pizza:latest .
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Push Docker image
+        run: |
+          docker tag e-commerce-pizza:latest ${{ secrets.DOCKERHUB_USERNAME }}/e-commerce-pizza:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/e-commerce-pizza:latest
+  # deploy:
+  #   runs-on: ubuntu-latest  # Change to your preferred runner
+
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v2
+
+  #     - name: Save Docker image
+  #       run: |
+  #         docker save -o e-commerce-pizza.tar e-commerce-pizza:latest
+
+  #     - name: Copy image to server
+  #       run: |
+  #         scp -i ${{ secrets.SSH_PRIVATE_KEY_PATH }} -P ${{ secrets.SSH_PORT }} e-commerce-pizza.tar root@srv22.mikr.us:/home
+
+  #     - name: SSH into server and execute commands
+  #       uses: appleboy/ssh-action@master
+  #       with:
+  #         host: srv22.mikr.us
+  #         username: root
+  #         key: ${{ secrets.SSH_PRIVATE_KEY }}
+  #         port: 22  # Update with your server's SSH port
+  #         script: |
+  #           cd /home/
+  #           docker load -i e-commerce-pizza.tar
+  #           docker rm -f $(docker ps -aq --filter "ancestor=e-commerce-pizza")
+  #           docker rmi $(docker images -f "dangling=true" -q)
+  #           docker run -p 20395:3000 -e MONGODB_URL=mongodb://t395:dTDSe67AjE@mongodb.mikr.dev:27017/db_t395 -e NEXTAUTH_URL=http://srv22.mikr.us:20395/ -e NEXTAUTH_SECRET=secret -e GOOGLE_CLIENT_ID=356219954166-s6lmnn56bdmii2ah51fvlvjb9cpngfm5.apps.googleusercontent.com -e GOOGLE_CLIENT_SECRET=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 e-commerce-pizza -d
