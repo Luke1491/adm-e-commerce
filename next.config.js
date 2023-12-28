@@ -6,6 +6,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "*.googleusercontent.com",
       },
+      {
+        protocol: "https",
+        hostname: "*954036011159-pizza-app-bucket.s3.eu-west-1.amazonaws.com",
+      },
     ],
   },
 };
