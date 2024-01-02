@@ -31,7 +31,10 @@ export default function Header() {
         <nav className="flex items-center gap-8">
           {status === "authenticated" && (
             <>
-              <Link href="/profile" className="whitespace-nowrap">
+              <Link
+                href="/profile"
+                className="whitespace-nowrap border rounded-full px-6 py-2 bg-gray-200"
+              >
                 Hello, {userName}
               </Link>
               <button

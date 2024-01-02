@@ -6,7 +6,8 @@ import { User } from "@/app/models/User";
 export async function PUT(req) {
   try {
     const body = await req.json();
-    const { name, image } = body;
+    const { name, image, phone, streetAddress, postalCode, city, country } =
+      body;
     const { user } = await getServerSession(authOptions);
     const { email } = user;
 
@@ -18,6 +19,11 @@ export async function PUT(req) {
 
     if (name) query.name = name;
     if (image) query.image = image;
+    if (phone) query.phone = phone;
+    if (streetAddress) query.streetAddress = streetAddress;
+    if (postalCode) query.postalCode = postalCode;
+    if (city) query.city = city;
+    if (country) query.country = country;
 
     //hold for a 2 seconds to simulate a slow network
     // await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -32,6 +38,24 @@ export async function PUT(req) {
 
     return Response.json(updatedUser || {});
     // return Response.json(true);
+  } catch (error) {
+    console.log(error);
+    return new Response("mongo error", { status: 403 });
+  }
+}
+
+export async function GET() {
+  try {
+    const { user } = await getServerSession(authOptions);
+    const { email } = user;
+
+    if (!email) return new Response("user not found", { status: 403 });
+
+    mongoose.connect(process.env.MONGODB_URL);
+
+    const foundUser = await User.findOne({ email: email }).exec();
+
+    return Response.json(foundUser || {});
   } catch (error) {
     console.log(error);
     return new Response("mongo error", { status: 403 });

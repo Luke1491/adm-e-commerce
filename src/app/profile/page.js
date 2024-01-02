@@ -4,35 +4,36 @@ import { useSession, reloadSession } from "next-auth/react";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
-import { CSSTransition } from "react-transition-group";
+import toast from "react-hot-toast";
 
 export default function ProfilePage() {
-  const savedBannerTimeCount = 3000;
-
   const session = useSession();
   const { status } = session;
 
-  const [userName, setUserName] = useState("jon");
-  const [saved, setSaved] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const [userName, setUserName] = useState("");
   const [image, setImage] = useState("");
-  const [isImageUploading, setIsImageUploading] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [streetAddress, setStreetAddress] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [city, setCity] = useState("");
+  const [country, setCountry] = useState("");
 
   /* use effect section */
   useEffect(() => {
     setUserName(session?.data?.user?.name);
     setImage(session?.data?.user?.image);
+    fetch("/api/profile", {
+      method: "GET",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setPhone(data?.phone);
+        setStreetAddress(data?.streetAddress);
+        setPostalCode(data?.postalCode);
+        setCity(data?.city);
+        setCountry(data?.country);
+      });
   }, [session, status]);
-
-  //set saved to false after 3 seconds
-  useEffect(() => {
-    if (saved) {
-      const timeout = setTimeout(() => {
-        setSaved(false);
-      }, savedBannerTimeCount);
-      return () => clearTimeout(timeout);
-    }
-  }, [saved]);
 
   /* end of use effect section */
 
@@ -47,44 +48,68 @@ export default function ProfilePage() {
 
   async function handleProfileInfoUpdate(e) {
     e.preventDefault();
-    setSaved(false);
-    setIsSaving(true);
     try {
-      const response = await fetch("/api/profile", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name: userName, image }),
+      const savingPromise = new Promise(async (resolve, reject) => {
+        const response = await fetch("/api/profile", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: userName,
+            image,
+            phone,
+            streetAddress,
+            postalCode,
+            city,
+            country,
+          }),
+        });
+        if (response.status === 200) {
+          resolve();
+        } else {
+          reject();
+        }
       });
-      if (response.status === 200) {
-        setSaved(true);
-        setIsSaving(false);
-      }
+      await toast.promise(savingPromise, {
+        loading: "Saving...",
+        success: "Saved!",
+        error: "Error saving profile",
+      });
     } catch (error) {
+      toast.error("Error saving profile");
       console.error(error);
     }
   }
 
   async function handleFileChange(e) {
     try {
-      setIsImageUploading(true);
       const file = e?.target?.files?.[0];
       const formData = new FormData();
       formData.append("image", file);
-      const response = await fetch("/api/profile/image", {
-        method: "PUT",
-        body: formData,
+
+      const savingImagePromise = new Promise(async (resolve, reject) => {
+        const response = await fetch("/api/profile/image", {
+          method: "PUT",
+          body: formData,
+        });
+        if (response.status === 200) {
+          const { linkToImage } = await response.json();
+          // console.log(linkToImage);
+          setImage(linkToImage);
+          resolve();
+        } else {
+          reject();
+        }
       });
-      if (response.status !== 200) {
-        return;
-      }
-      const { linkToImage } = await response.json();
-      console.log(linkToImage);
-      setImage(linkToImage);
-      setIsImageUploading(false);
-      reloadSession();
+
+      await toast.promise(savingImagePromise, {
+        loading: "Uploading image...",
+        success: "Image uploaded!",
+        error: "Error uploading image",
+      });
     } catch (error) {
+      toast.error("Error uploading image");
       console.error(error);
     }
   }
@@ -94,27 +119,12 @@ export default function ProfilePage() {
       <h1 className="text-center text-primary text-4xl mb-4">Profile</h1>
 
       <div className="max-w-md mx-auto">
-        {isSaving && (
-          <h2 className="text-center border-blue-300 border-2 rounded-lg text-blue-700 bg-blue-200 text-2xl mb-4">
-            Saving ...
-          </h2>
-        )}
-        {isImageUploading && (
-          <h2 className="text-center border-blue-300 border-2 rounded-lg text-blue-700 bg-blue-200 text-2xl mb-4">
-            Uploading ...
-          </h2>
-        )}
-        <CSSTransition in={saved} timeout={500} classNames="fade" unmountOnExit>
-          <h2 className="text-center border-green-300 border-2 rounded-lg text-green-700 bg-green-200 text-2xl mb-4">
-            Profile saved!
-          </h2>
-        </CSSTransition>
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2">
           <div>
             <div className="bg-gray-100 p-4 rounded-lg relative max-w-[120px]">
               <Image
                 className="rounded-lg w-full h-full mb-1"
-                src={image || "/google.png"}
+                src={image}
                 alt="user image"
                 width="250"
                 height="250"
@@ -133,17 +143,60 @@ export default function ProfilePage() {
             </div>
           </div>
           <form className="grow" onSubmit={handleProfileInfoUpdate}>
+            <label>First and last name</label>
             <input
               type="text"
               placeholder="First and last name"
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
             />
+            <label>Email</label>
             <input
               className=""
               type="email"
               disabled={true}
               value={session?.data?.user?.email || ""}
+            />
+            <label>Phone Number</label>
+            <input
+              type="tel"
+              placeholder="Phone Number"
+              value={phone}
+              onChange={(ev) => setPhone(ev.target.value)}
+            />
+            <label>Street Address</label>
+            <input
+              type="text"
+              placeholder="Street Address"
+              value={streetAddress}
+              onChange={(ev) => setStreetAddress(ev.target.value)}
+            />
+            <div className="flex gap-2">
+              <div className="flex-grow">
+                <label>Postal Code</label>
+                <input
+                  type="text"
+                  placeholder="postal code"
+                  value={postalCode}
+                  onChange={(ev) => setPostalCode(ev.target.value)}
+                />
+              </div>
+              <div className="flex-grow">
+                <label>City</label>
+                <input
+                  type="text"
+                  placeholder="City"
+                  value={city}
+                  onChange={(ev) => setCity(ev.target.value)}
+                />
+              </div>
+            </div>
+            <label>Country</label>
+            <input
+              type="text"
+              placeholder="Country"
+              value={country}
+              onChange={(ev) => setCountry(ev.target.value)}
             />
             <button type="Submit">Save</button>
           </form>

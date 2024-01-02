@@ -7,15 +7,24 @@ section.hero {
   grid-template-columns: 0.4fr 0.6fr;
 }
 
+label {
+  @apply text-gray-500 text-sm font-semibold;
+}
+label + input {
+  margin-top: -2px;
+}
+
 input[type="email"],
 input[type="password"],
+input[type="tel"],
 input[type="text"] {
-  @apply block w-full my-2 rounded-xl;
+  @apply block w-full mb-2 rounded-xl;
   @apply border p-2 border-gray-300 bg-gray-100;
 }
 
 input[type="email"]:disabled,
 input[type="password"]:disabled,
+input[type="tel"]:disabled,
 input[type="text"]:disabled {
   @apply bg-gray-300 text-gray-500 border-0 cursor-not-allowed;
 }
@@ -33,22 +42,4 @@ button.submit {
 button[type="submit"]:disabled,
 button.submit:disabled {
   @apply cursor-not-allowed bg-gray-100 text-red-600;
-}
-
-.fade-enter {
-  opacity: 0;
-  transition: opacity 0.5s ease-in;
-}
-
-.fade-enter-active {
-  opacity: 1;
-}
-
-.fade-exit {
-  opacity: 1;
-  transition: opacity 0.5s ease-out;
-}
-
-.fade-exit-active {
-  opacity: 0;
 }
