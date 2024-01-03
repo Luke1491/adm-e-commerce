@@ -28,7 +28,7 @@ export const authOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
-        console.log("credentials", credentials);
+        // console.log("credentials", credentials);
         const { email, password } = credentials;
 
         try {
@@ -37,7 +37,7 @@ export const authOptions = {
           const passwordOk =
             user && bcrypt.compareSync(password, user.password);
 
-          console.log(passwordOk);
+          // console.log(passwordOk);
 
           if (passwordOk) {
             return user;
@@ -45,7 +45,7 @@ export const authOptions = {
             return null;
           }
         } catch (error) {
-          console.log(error);
+          console.error(error);
           return null;
         }
       },

@@ -1,10 +1,11 @@
 "use client";
 
-import { useSession, reloadSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import UserTabs from "../../components/layout/UserTabs";
 
 export default function ProfilePage() {
   const session = useSession();
@@ -17,11 +18,14 @@ export default function ProfilePage() {
   const [postalCode, setPostalCode] = useState("");
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isProfileFetching, setIsProfileFetching] = useState(false);
 
   /* use effect section */
   useEffect(() => {
     setUserName(session?.data?.user?.name);
     setImage(session?.data?.user?.image);
+    setIsProfileFetching(true);
     fetch("/api/profile", {
       method: "GET",
     })
@@ -32,12 +36,14 @@ export default function ProfilePage() {
         setPostalCode(data?.postalCode);
         setCity(data?.city);
         setCountry(data?.country);
+        setIsAdmin(data?.admin);
+        setIsProfileFetching(false);
       });
   }, [session, status]);
 
   /* end of use effect section */
 
-  if (status === "loading") {
+  if (status === "loading" || isProfileFetching) {
     return (
       <h1 className="text-center text-primary text-4xl mt-10">Loading ...</h1>
     );
@@ -116,15 +122,14 @@ export default function ProfilePage() {
 
   return (
     <section className="mt-8">
-      <h1 className="text-center text-primary text-4xl mb-4">Profile</h1>
-
-      <div className="max-w-md mx-auto">
+      <UserTabs isAdmin={isAdmin} />
+      <div className="max-w-md mx-auto mt-8">
         <div className="flex gap-2">
           <div>
             <div className="bg-gray-100 p-4 rounded-lg relative max-w-[120px]">
               <Image
                 className="rounded-lg w-full h-full mb-1"
-                src={image}
+                src={image || "/google.png"}
                 alt="user image"
                 width="250"
                 height="250"

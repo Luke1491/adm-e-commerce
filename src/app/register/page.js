@@ -28,13 +28,13 @@ export default function RegisterPage() {
       })
         .then((response) => response)
         .then((data) => {
-          console.log(data);
+          // console.log(data);
           if (data.status !== 200) setError(data.statusText);
         });
       setCreatingUser(false);
       setCreatedUser(true);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       setCreatingUser(false);
       setError(error);
     }

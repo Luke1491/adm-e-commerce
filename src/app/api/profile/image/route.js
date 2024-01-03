@@ -20,7 +20,7 @@ export async function PUT(req) {
       },
     });
 
-    console.log("image name: ", image.name);
+    // console.log("image name: ", image.name);
 
     //get file extension
     const fileExtension = image.name.split(".").pop();
@@ -52,7 +52,7 @@ export async function PUT(req) {
 
     return Response.json({ linkToImage: linkToImage });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return new Response("mongo error", {
       status: 403,
     });

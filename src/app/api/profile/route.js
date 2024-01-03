@@ -39,17 +39,17 @@ export async function PUT(req) {
     return Response.json(updatedUser || {});
     // return Response.json(true);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return new Response("mongo error", { status: 403 });
   }
 }
 
 export async function GET() {
   try {
-    const { user } = await getServerSession(authOptions);
-    const { email } = user;
+    const session = await getServerSession(authOptions);
+    const email = session?.user?.email;
 
-    if (!email) return new Response("user not found", { status: 403 });
+    if (!email) return Response.json({}, { status: 403 });
 
     mongoose.connect(process.env.MONGODB_URL);
 
@@ -57,7 +57,7 @@ export async function GET() {
 
     return Response.json(foundUser || {});
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return new Response("mongo error", { status: 403 });
   }
 }
